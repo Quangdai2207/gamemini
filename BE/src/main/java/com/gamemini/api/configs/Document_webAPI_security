@@ -1,0 +1,58 @@
+Huong dan cau hinh Spring Security cho Spring Boot WebAPI
+
+1. Spring Security
+   Spring Security la Framework thuoc he sinh thai cua Spring Java.
+   Spring Security trong web API/MVC duoc xem la Layer 1 cua ung dung Spring Java
+   Nhiem vu cua Spring Security:
+        + Xac thuc nguoi dung - Authentication
+        + Phan quyen nguoi dung - Authorization
+
+          => Xac thuc Request truoc khi request den layer tiep theo la controller.
+
+2. Cau hinh Spring Security
+   Spring Security quan ly cau hinh thong qua cac annotation:
+        + @Bean              -> Quan ly doi tuong, injections va dao nguoc quyen quan ly (IOC)
+        + @Configuration     -> Danh dau la mot lop cau hinh
+        + @Component         -> Danh dau la lop thanh phan thuoc lop cau hinh @Coniguration
+
+   Cac lop cau hinh voi annotation @Configuration gom nhieu methods, moi method phai duoc danh dau bang @Bean.
+   Moi mot method co the tach rieng thanh cac lop cau hinh @Configuration rieng biet, dieu nay giup cho viec quan ly va
+   bao tri de dang hon neu nhu phat sinh cac cau hinh phuc tap va can xu ly chuyen sau.
+
+   Khi cau hinh Spring Seecurity cho webApi, cac methods can thiet nhu:
+
+        + @Bean
+          public SecurityFilterChain securityFilterChain(HttpSecurity http)
+          Chuoi filter chinh cua Spring Security, gom hang loat cac cau hinh ben trong chuoi xu ly filter cua Spring Security
+
+        + @Bean
+          public BCryptPasswordEncoder bCryptPasswordEncoder()
+          Chiu trach nhiem decode va encode mat khau nguoi dung
+
+        + @Bean
+          public AuthenticationManager manager(AuthenticationConfiguration config)
+          Quan ly xac thuc nguoi dung
+
+        + @Bean
+          public AuthenticationProvider authenticationProvider()
+          Cung cap du lieu nguoi dung tu DB de xac thuc
+
+        + @Bean
+          public CorsConfigurationSource corsConfigurationSource()
+          Cau hinh Cors Origin cho client khi truy cap tai nguyen cua WebApi.
+
+   Trong 5 phuong thuc cau hinh tren, SecurityFilterChain la cau hinh chinh bao gom nhieu cau hinh ben trong phuc vu cho
+   chuoi xu ly filter du lieu nguoi dung.
+
+   Toan bo noi dung trong package "springWeb" la cau hinh theo tieu chuan cua webApi co dung JWT. Co the ap dung package
+   "springWeb" cho bat ky du an nao. Co the thay doi noi dung trong lop cau hinh va component:
+        + @Component CustomUserDetailService:
+            Co the thay doi username hoac email hoac bat ky thong tin gi can xac thuc
+
+        + @Configuration CorsConfigurations:
+            Co the thay doi origin client phu hop voi webApi cho phep truy cap hoac cac thong tin can thiet khac
+
+        + @Configuration SecurityConfiguration:
+            Co the thay doi noi dung permission trong cau hinh authorizeHttpRequests() cua SpringFilterChains
+
+

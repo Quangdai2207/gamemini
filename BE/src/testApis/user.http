@@ -1,0 +1,20 @@
+### GET ALL
+GET {{host}}{{version.v1}}{{controller.user}}
+Content-Type: application/json
+
+### GET DETAILS
+GET {{host}}{{version.v1}}{{controller.user}}/1
+Content-Type: application/json
+
+### ADD NEW
+POST {{host}}{{version.v1}}{{controller.user}}
+Content-Type: application/json
+
+### UPDATE
+PUT {{host}}{{version.v1}}{{controller.user}}/1
+Content-Type: application/json
+
+
+### DELETE
+DELETE {{host}}{{version.v1}}{{controller.user}}/1
+Content-Type: application/json

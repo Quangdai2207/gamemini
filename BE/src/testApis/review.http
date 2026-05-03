@@ -1,0 +1,29 @@
+### GET ALL
+GET {{host}}{{version.v1}}{{controller.review}}
+Content-Type: application/json
+
+### GET ALL BY POKEMON ID
+GET {{host}}{{version.v1}}{{controller.review}}/pokemon/2?page=0&size=10
+Content-Type: application/json
+
+### GET ALL BY USENAME
+GET {{host}}{{version.v1}}{{controller.review}}/daitran/?page=0&size=10
+Content-Type: application/json
+
+### GET DETAILS
+GET {{host}}{{version.v1}}{{controller.review}}/1
+Content-Type: application/json
+
+### ADD NEW
+POST {{host}}{{version.v1}}{{controller.review}}
+Content-Type: application/json
+
+
+### UPDATE
+PUT {{host}}{{version.v1}}{{controller.review}}/1
+Content-Type: application/json
+
+
+### DELETE
+DELETE {{host}}{{version.v1}}{{controller.review}}/1
+Content-Type: application/json

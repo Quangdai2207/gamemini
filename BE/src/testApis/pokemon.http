@@ -1,0 +1,28 @@
+### GET ALL
+GET {{host}}{{role.user}}{{version.v2}}{{controller.pokemon}}/?page=0
+Content-Type: application/json
+
+### GET DETAILS
+GET {{host}}{{version.v1}}{{controller.pokemon}}/2
+Content-Type: application/json
+
+### ADD NEW
+POST {{host}}{{version.v1}}{{controller.pokemon}}
+Content-Type: application/jsond
+
+{
+  "name": "Pikachu",
+  "type": "Fires"
+}
+
+### UPDATE
+PUT {{host}}{{version.v1}}{{controller.pokemon}}/1
+Content-Type: application/json
+
+{
+  "type" : "water"
+}
+
+### DELETE
+DELETE {{host}}{{version.v1}}{{controller.pokemon}}/4
+Content-Type: application/json
