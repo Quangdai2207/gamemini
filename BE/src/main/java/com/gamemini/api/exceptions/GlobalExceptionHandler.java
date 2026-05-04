@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -219,5 +220,10 @@ public class GlobalExceptionHandler {
     public <T> ResponseEntity<ApiResponse<T>> handleUsernameNotFound(BadCredentialsException e) {
         log.error("BadCredentialsException.class ", e.getMessage());
         return ApiResponse.badRequest("Your account is invalid.");
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public <T> ResponseEntity<ApiResponse<T>> handleInvalidDataAccessApiUsage(InvalidDataAccessApiUsageException e) {
+        return ApiResponse.badRequest("Data access invalid");
     }
 }

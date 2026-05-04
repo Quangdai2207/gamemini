@@ -24,21 +24,9 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<AuthData>> me(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ApiResponse.unauthorize(AuthData
-                    .builder()
-                    .token("")
-                    .username("")
-                    .build());
-        }
-        System.out.println(authentication.toString());
-        return ApiResponse.ok(AuthData
-                .builder()
-                .token("")
-                .username(authentication.getName())
-                .build(), "Login Successful");
+    @GetMapping("/authenticated")
+    public ResponseEntity<ApiResponse<AuthData>> authenticated(Authentication authentication) {
+        return authService.checkLogin(authentication);
     }
 
     @PostMapping("/login")

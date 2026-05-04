@@ -1,6 +1,7 @@
 package com.gamemini.api.services.auth;
 
 import com.gamemini.api.configs.springWeb.jwt.JWTGenerator;
+import com.gamemini.api.configs.springWeb.jwt.SecurityConstant;
 import com.gamemini.api.dtos.requestes.auth.RequestLogin;
 import com.gamemini.api.dtos.requestes.auth.RequestRegister;
 import com.gamemini.api.dtos.responses.ApiResponse;
@@ -25,25 +26,33 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class AuthService implements IAuthService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTGenerator jwtGenerator;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JWTGenerator jwtGenerator;
+    public AuthService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            UserRoleRepository userRoleRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            AuthenticationManager authenticationManager,
+            JWTGenerator jwtGenerator
+    ) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtGenerator = jwtGenerator;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
 
     @Override
@@ -70,7 +79,6 @@ public class AuthService implements IAuthService {
         return ApiResponse.ok(AuthData
                 .builder()
                 .username(user.getUsername())
-                .token("")
                 .build(), "Registered successfully.");
     }
 
@@ -82,7 +90,7 @@ public class AuthService implements IAuthService {
         /// Ngay tai buoc nay, neu nguoi dung nhap sai username hoac password thi loi ngoai le
         /// BadCredentialException duoc GlobalException xu ly ngay lap tuc.
         /// Neu ten nguoi dung va password sau khi hash khop voi DB thi nguoi dung dang nhap thanh cong
-        Authentication authentication = authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword()));
 
         /// Co du lieu nguoi dung sau khi authentication thanh cong -> Dang nhap thanh cong
         UserDetails user = (UserDetails) authentication.getPrincipal();
@@ -96,12 +104,7 @@ public class AuthService implements IAuthService {
          *  =>> Neu sau khi xac minh toan bo thong nguoi nguoi dung hop le thi thuc hien buoc set token len cookie cho origin hoac co the cap tokem
          *  cho nguoi dung thong qua header (Neu cap token cho Client thi nen cap thong qua Header thay vi body Response)
          * */
-
-        System.out.println("Test UserDetails Info: " + user.toString());
-        System.out.println("Test authentication Info: " + authentication.toString());
-
-        System.out.println("UserDetails Object => " + user.getUsername()); /// Kiem tra thong tin username cua user
-        System.out.println("Get authorities() from userDetails => " + user.getAuthorities().toArray().toString()); /// Kiem tra thong tin username cua user
+        /// Kiem tra thong tin username cua user
         user.getAuthorities().forEach(ga -> System.out.println(ga.getAuthority()));
 
         /// Tao token cho nguoi dung sau khi xac thuc va login thanh cong
@@ -110,16 +113,34 @@ public class AuthService implements IAuthService {
         /// Thiet lap cau hinh cho Cookie.
         Cookie cookie = new Cookie("access_token", token);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60);
+        cookie.setMaxAge(60 * 60);  /// Sau 1h dong ho, cookie tu loai bo token tren trinh duyet.
+                                    /// Mac du thoi gian Cookie chuc token le 1h, nhung thoi gian song cua token chi 70000 (70s),
+                                    /// Khi BE lay token tu cookie xac thuc va validate token, neu het han -> gui thong bao
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
 
         /// dung Response Object push token len Cookie Origin
         response.addCookie(cookie);
 
 
         return ApiResponse.ok(AuthData.builder()
-                .token("abc")
+                .username(authentication.getName())
+                .build(), "Authenticated successfully.");
+    }
+    /// checkLogin la phuong thuc kiem tra user do da duoc xac thuc hay chua, Neu da xac thuc roi thi khong can login nua, con neu chua
+    /// thi phai login.
+    /// FE fetch API checkLogin de kiem tra, neu nguoi dung chua dang nhap thi render Login Page, Neu dang nhap thanh cong roi thi dieu
+    /// huong ve HOME Page
+    public ResponseEntity<ApiResponse<AuthData>> checkLogin(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ApiResponse.unauthorize(AuthData
+                    .builder()
+                    .username("")
+                    .build());
+        }
+
+        return ApiResponse.ok(AuthData
+                .builder()
                 .username(authentication.getName())
                 .build(), "Authenticated successfully.");
     }

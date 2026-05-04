@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailService customUserDetailsService;
 
     @Autowired
-    public JwtAuthenticationFilter(JWTGenerator tokenGenerator,  CustomUserDetailService customUserDetailsService) {
+    public JwtAuthenticationFilter(JWTGenerator tokenGenerator, CustomUserDetailService customUserDetailsService) {
         this.tokenGenerator = tokenGenerator;
         this.customUserDetailsService = customUserDetailsService;
     }
@@ -62,6 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = getTokenFromCookieOrigin(request);
 
         if (jwtToken != null && tokenGenerator.validateToken(jwtToken)) {
+            System.out.println("jwtToken: " + jwtToken);
             String username = tokenGenerator.getUsernameFromJWT(jwtToken);
 
             /// UserDetails lay thong tin nguoi dung tu DB va kiem tra lao Role cua nguoi dung, nhu:
@@ -79,11 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             /// Dua doi tuong "trang thai nguoi dung dang nhap thanh cong" vao Spring SecurityContext
             /// Dieu nay giup cho Spring Security biet duoc request nay da duoc xac thuc
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } else {
+            System.out.println("jwtToken: " + jwtToken);
+            System.out.println("Token was removed in the cookie or expired!");
         }
-
-        chain.doFilter(request, response);
-
         logger.debug("doFilterInternal filter >>>");
+        chain.doFilter(request, response);
     }
 }
 

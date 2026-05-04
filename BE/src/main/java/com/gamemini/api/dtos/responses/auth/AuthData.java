@@ -9,6 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class AuthData {
-    private String token;
     private String username;
 }
