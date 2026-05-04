@@ -15,3 +15,8 @@ Content-Type: application/json
   "username": "Khang Pham",
   "password" : "khang@12345"
 }
+
+###
+GET http://localhost:8080/api/v1/auth/me
+Content-Type: application/json
+Cookie: access_token=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJLaGFuZyBQaGFtIiwiaWF0IjoxNzc3ODYzNjYzLCJleHAiOjE3Nzc4NjM3MzN9.b3LMbW2JoQYm0rpdm_3S69_Tc8YKkAUQNZIqRq059hesDor-mY9R7UItbXn1tQ2wvCY9pSpI-blN-wALU4J_eg

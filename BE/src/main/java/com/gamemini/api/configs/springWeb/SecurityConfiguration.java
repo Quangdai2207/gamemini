@@ -53,6 +53,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(
                                     "/",
+                                    "/me",
                                     "/api/v1/auth/**",
                                     "/ws/**",
                                     "/app/**",

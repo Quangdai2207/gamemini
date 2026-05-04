@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 /// Tao token
 @Component
 public class JWTGenerator {
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private static final String secretKey = "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
 
     /// Tao Token
     public String generateToken(Authentication authentication) {
@@ -29,7 +29,7 @@ public class JWTGenerator {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS512)
                 .compact();
         System.out.println("New token : " + token);
         return token;
@@ -38,7 +38,7 @@ public class JWTGenerator {
     ///  Lay Username tu Token
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -49,12 +49,13 @@ public class JWTGenerator {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
                     .build()
                     .parseClaimsJws(token);
             return true;
         } catch (Exception ex) {
-            throw new AuthenticationCredentialsNotFoundException("JWT was exprired or incorrect", ex.fillInStackTrace());
+            System.out.println("JWT ERROR: " + ex.getMessage());
+            return false;
         }
     }
 }

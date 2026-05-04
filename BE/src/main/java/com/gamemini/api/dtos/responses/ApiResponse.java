@@ -175,4 +175,32 @@ public class ApiResponse<T> {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
+
+    public static <T> ResponseEntity<ApiResponse<T>> unauthorize(T data) {
+        ApiResponse<T> body = new ApiResponse<>();
+        body.setStatus(HttpStatus.UNAUTHORIZED.value());
+        body.setSuccess(false);
+        body.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        body.setData(data);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> unauthorize() {
+        ApiResponse<T> body = new ApiResponse<>();
+        body.setStatus(HttpStatus.UNAUTHORIZED.value());
+        body.setSuccess(false);
+        body.setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> unauthorize(String message) {
+        ApiResponse<T> body = new ApiResponse<>();
+        body.setStatus(HttpStatus.UNAUTHORIZED.value());
+        body.setSuccess(false);
+        body.setMessage(message);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
 }

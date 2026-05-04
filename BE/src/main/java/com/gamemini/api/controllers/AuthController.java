@@ -10,17 +10,36 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    @Autowired
     private AuthService authService;
+
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<AuthData>> me(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ApiResponse.unauthorize(AuthData
+                    .builder()
+                    .token("")
+                    .username("")
+                    .build());
+        }
+        System.out.println(authentication.toString());
+        return ApiResponse.ok(AuthData
+                .builder()
+                .token("")
+                .username(authentication.getName())
+                .build(), "Login Successful");
+    }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthData>> login(
